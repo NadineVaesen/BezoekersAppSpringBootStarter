@@ -15,5 +15,6 @@ public class BezoekersRest {
 	private static final Logger LOGGER = LogManager.getLogger(BezoekersRest.class);
 
 	// TODO Add Rest endpoints
+	// Hint: gebruik ResponseEntity<Long> als return-type voor het rest endpoint om een bezoeker te registreren
 
 }
