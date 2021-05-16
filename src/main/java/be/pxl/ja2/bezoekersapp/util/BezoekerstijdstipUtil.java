@@ -1,6 +1,6 @@
-package be.pxl.ja2.examen.util;
+package be.pxl.ja2.bezoekersapp.util;
 
-import be.pxl.ja2.examen.util.exception.OngeldigTijdstipException;
+import be.pxl.ja2.bezoekersapp.util.exception.OngeldigTijdstipException;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;

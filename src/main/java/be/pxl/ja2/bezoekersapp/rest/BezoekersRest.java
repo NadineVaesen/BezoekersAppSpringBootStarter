@@ -1,4 +1,4 @@
-package be.pxl.ja2.examen.rest;
+package be.pxl.ja2.bezoekersapp.rest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

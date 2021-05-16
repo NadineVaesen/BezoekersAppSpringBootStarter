@@ -1,4 +1,4 @@
-package be.pxl.ja2.examen.model;
+package be.pxl.ja2.bezoekersapp.model;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;

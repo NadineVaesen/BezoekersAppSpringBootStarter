@@ -1,4 +1,4 @@
-package be.pxl.ja2.examen.servlet;
+package be.pxl.ja2.bezoekersapp.servlet;
 
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;

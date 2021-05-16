@@ -1,4 +1,4 @@
-package be.pxl.ja2.examen.rest.resources;
+package be.pxl.ja2.bezoekersapp.rest.resources;
 
 import java.time.LocalTime;
 

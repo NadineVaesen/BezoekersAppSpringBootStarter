@@ -1,4 +1,4 @@
-package be.pxl.ja2.examen;
+package be.pxl.ja2.bezoekersapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

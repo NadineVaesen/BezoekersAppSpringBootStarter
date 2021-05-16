@@ -1,7 +1,7 @@
-package be.pxl.ja2.examen.service;
+package be.pxl.ja2.bezoekersapp.service;
 
-import be.pxl.ja2.examen.model.Bezoeker;
-import be.pxl.ja2.examen.rest.resources.RegistreerBezoekerResource;
+import be.pxl.ja2.bezoekersapp.model.Bezoeker;
+import be.pxl.ja2.bezoekersapp.rest.resources.RegistreerBezoekerResource;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;

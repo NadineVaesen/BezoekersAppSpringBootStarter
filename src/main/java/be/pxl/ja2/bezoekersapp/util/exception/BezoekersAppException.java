@@ -1,4 +1,4 @@
-package be.pxl.ja2.examen.util.exception;
+package be.pxl.ja2.bezoekersapp.util.exception;
 
 public class BezoekersAppException extends Exception {
 
