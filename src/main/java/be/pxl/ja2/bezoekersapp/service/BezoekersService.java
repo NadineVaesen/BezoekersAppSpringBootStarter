@@ -5,6 +5,7 @@ import be.pxl.ja2.bezoekersapp.dao.PatientDAO;
 import be.pxl.ja2.bezoekersapp.model.Bezoeker;
 import be.pxl.ja2.bezoekersapp.model.Patient;
 import be.pxl.ja2.bezoekersapp.rest.dto.BezoekerDTO;
+import be.pxl.ja2.bezoekersapp.rest.dto.PatientDTO;
 import be.pxl.ja2.bezoekersapp.rest.resources.RegistreerBezoekerResource;
 import be.pxl.ja2.bezoekersapp.util.BezoekerstijdstipUtil;
 import be.pxl.ja2.bezoekersapp.util.exception.BezoekersAppException;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,47 +42,60 @@ public class BezoekersService {
         //ontbreekt er info?
         controleerAlleVeldenBezoekersResource(registreerBezoekerResource);
 
-        //is de patiëntcode gekend?
-        if (isPatientCodeNietGeldig(registreerBezoekerResource.getPatientCode())) {
-            throw new BezoekersAppException("Patiëntcode niet correct!");
+        System.out.println("resource: " + registreerBezoekerResource.getNaam());
+
+        //er mogen maar 2 bezoekers zijn op 1 afdeling
+        ////vindt de afdeling => eerst patient zoeken
+        Optional<Patient> patientDTO = patientDAO.findById(registreerBezoekerResource.getPatientCode());
+        List<Bezoeker> alleBezoekersVanAfdeling;
+
+        if (patientDTO.isPresent()) {
+            alleBezoekersVanAfdeling = getBezoekersVoorAfdeling(patientDTO.get().getAfdeling().getCode());
+        } else {
+            throw new BezoekersAppException("De patientcode is niet juist.");
         }
-
-
-
-
-
-        //is er al een bezoeker geregistreerd voor de patiënt?
-        ////vind de patiënt om de afdeling te vinden (hierboven werd al gecontroleerd of de patiënt bestaat)
-        Patient patient = null;
-        if (patientDAO.findById(registreerBezoekerResource.getPatientCode()).isPresent()) {
-            patient = patientDAO.findById(registreerBezoekerResource.getPatientCode()).get();
+        for (var item :
+                alleBezoekersVanAfdeling) {
+            System.out.println("bezoekers van afdeling " + patientDTO.get().getAfdeling().getCode() + ": " + item.getNaam() + item.getTijdstip());
         }
+        ////als de lijst niet leeg is, moet het tijdstip vergeleken worden. Als die niet overeenkomt is er geen probleem
+        ////is het hetzelfde tijdstip mag er niet meer dan 1 zijn.
+        List<Bezoeker> alleBezoekersMetZelfdeTijdstip = new ArrayList<>();
 
 
-        ////kijk onder alle bezoekers of er al iemand is met dezelfde patiëntcode
-        ////lijst met alle bezoekers van dezelfde afdeling
-        assert patient != null;
-        var bezoekersVoorAfdeling = getBezoekersVoorAfdeling(patient.getAfdeling().getCode());
-
-        ////lijst met alle bezoekers voor dezelfde patient
-        Patient finalPatient = patient;
-        var bezoekersVoorPatient = bezoekersVoorAfdeling.stream()
-                .filter(y -> y.getPatient().equals(finalPatient))
-                .collect(Collectors.toList());
-
-        int aantalBezoekersMetZelfdeTijdstip = 0;
-
-        if (!bezoekersVoorPatient.isEmpty()) {
-            for (var bezoek :
-                    bezoekersVoorPatient) {
-                if (bezoek.getTijdstip() == registreerBezoekerResource.getTijdstip()) {
-                    aantalBezoekersMetZelfdeTijdstip += 1;
+        if (!alleBezoekersVanAfdeling.isEmpty()) {
+            for (var bezoeker :
+                    alleBezoekersVanAfdeling) {
+                if (bezoeker.getTijdstip().equals(registreerBezoekerResource.getTijdstip())) {
+                    alleBezoekersMetZelfdeTijdstip.add(bezoeker);
                 }
             }
         }
-        if (aantalBezoekersMetZelfdeTijdstip > BEZOEKERS_PER_TIJDSTIP_PER_AFDELING) {
-            throw new BezoekersAppException("Er zijn al " + BEZOEKERS_PER_TIJDSTIP_PER_AFDELING + " bezoekers met hetzelfde tijdstip. \nKies een nieuw tijdstip.");
+
+        for (var item :
+                alleBezoekersMetZelfdeTijdstip) {
+            System.out.println("bezoekers met zelfde tijdstip: " + item.getTijdstip());
         }
+
+        if(!alleBezoekersMetZelfdeTijdstip.isEmpty()) {
+            if (alleBezoekersMetZelfdeTijdstip.size() > 1) {
+                throw new BezoekersAppException("Er zijn al 2 bezoekers geregistreerd. Kies een ander tijdstip");
+            }
+        }
+
+        var alleBezoekers = getAlleBezoekers();
+
+        //kijk of er reeds een bezoeker is met dezelfde patient
+        for (var bezoeker : alleBezoekers
+        ) {
+            if (bezoeker == mapToBezoekerDTOFromResource(registreerBezoekerResource)) {
+                throw new BezoekersAppException("Er is reeds een bezoeker geregistreerd voor patient " + registreerBezoekerResource.getPatientCode());
+            }
+        }
+
+        //controlleer tijdstip
+        BezoekerstijdstipUtil.controleerBezoekerstijdstip(registreerBezoekerResource.getTijdstip());
+
 
         //registreer bezoeker
         Bezoeker bezoeker = mapToBezoeker(registreerBezoekerResource);
@@ -92,6 +107,13 @@ public class BezoekersService {
             return null;
         }
         return result;
+    }
+
+    private BezoekerDTO mapToBezoekerDTOFromResource(RegistreerBezoekerResource registreerBezoekerResource) {
+        BezoekerDTO bezoekerDTO = new BezoekerDTO();
+        bezoekerDTO.setVoornaam(registreerBezoekerResource.getVoornaam());
+        bezoekerDTO.setNaam(registreerBezoekerResource.getNaam());
+        return bezoekerDTO;
     }
 
     private boolean isPatientCodeNietGeldig(String patientCode) {
@@ -113,8 +135,6 @@ public class BezoekersService {
             throw new BezoekersAppException("Vul de patiëntencode in.");
         }
         BezoekerstijdstipUtil.controleerBezoekerstijdstip(registreerBezoekerResource.getTijdstip());
-
-
     }
 
     private Bezoeker mapToBezoeker(RegistreerBezoekerResource registreerBezoekerResource) throws BezoekersAppException {

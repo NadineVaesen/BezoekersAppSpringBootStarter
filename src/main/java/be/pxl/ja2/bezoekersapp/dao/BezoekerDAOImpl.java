@@ -1,7 +1,6 @@
 package be.pxl.ja2.bezoekersapp.dao;
 
 import be.pxl.ja2.bezoekersapp.model.Bezoeker;
-import be.pxl.ja2.bezoekersapp.rest.dto.BezoekerDTO;
 import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
@@ -33,17 +32,25 @@ public class BezoekerDAOImpl implements BezoekerDAO {
 
     @Override
     public List<Bezoeker> getBezoekersVoorAfdeling(String afdelingCode) {
-        var bezoekersQuery = entityManager.createNamedQuery("findAllBezoekers", Bezoeker.class);
-        bezoekersQuery.setParameter("codeAfdeling", afdelingCode);
-        return bezoekersQuery.getResultList();
+        //vind alle bezoekers
+        var alleBezoekers = getAlleBezoekers();
+
+        List<Bezoeker> alleBezoekersAfdeling = new ArrayList<>();
+
+        //verzamel alle bezoekers met dezelfde afdelingscode
+        for (var bezoeker :
+                alleBezoekers) {
+            if (bezoeker.getPatient().getAfdeling().getCode().equals(afdelingCode)) {
+                alleBezoekersAfdeling.add(bezoeker);
+            }
+        }
+        return alleBezoekersAfdeling;
     }
 
     @Override
     public List<Bezoeker> getAlleBezoekers() {
-        var resultList = entityManager.createQuery("SELECT b.voornaam  FROM Bezoeker b").getResultList();
-        List<Bezoeker> bezoekers = new ArrayList<>();
+        return entityManager.createNamedQuery("findAllBezoekers", Bezoeker.class).getResultList();
 
-        return bezoekers;
     }
 
 }

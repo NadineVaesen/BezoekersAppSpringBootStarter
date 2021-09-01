@@ -1,12 +1,13 @@
 package be.pxl.ja2.bezoekersapp.model;
 
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@NamedQueries({
+		@NamedQuery(name = "findAllPatients", query = "SELECT p FROM Patient p")
+})
 public class Patient {
 
 	@Id
