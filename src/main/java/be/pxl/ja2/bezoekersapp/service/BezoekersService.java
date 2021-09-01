@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -116,9 +117,6 @@ public class BezoekersService {
         return bezoekerDTO;
     }
 
-    private boolean isPatientCodeNietGeldig(String patientCode) {
-        return patientDAO.findById(patientCode).isPresent();
-    }
 
 
     private void controleerAlleVeldenBezoekersResource(RegistreerBezoekerResource registreerBezoekerResource) throws BezoekersAppException, OngeldigTijdstipException {
@@ -158,7 +156,21 @@ public class BezoekersService {
     }
 
     public void controleerBezoek(Long bezoekerId, LocalDateTime aanmelding) throws Exception {
-        bezoekerDAO.controleerBezoek(bezoekerId, aanmelding);
+        Bezoeker bezoeker = bezoekerDAO.findBezoekerById(bezoekerId);
+        if (bezoeker == null) {
+            throw new BezoekersAppException("U bent niet gekend in ons systeem");
+        }
+        if (bezoeker.isReedsAangemeld(aanmelding.toLocalDate())) {
+            throw new BezoekersAppException("U bent al aangemeld.");
+        }
+
+        if (aanmelding.isBefore(bezoeker.getAanmelding().minusMinutes(15))) {
+            throw new BezoekersAppException("U bent te vroeg voor uw afspraak");
+        }
+        if (aanmelding.isAfter(bezoeker.getAanmelding().plusMinutes(15))) {
+            throw new BezoekersAppException("U bent te laat voor uw afspraak");
+        }
+        bezoekerDAO.registreerAanmeldingVoorBezoek(bezoeker);
     }
 
     public List<Bezoeker> getBezoekersVoorAfdeling(String afdelingCode) {

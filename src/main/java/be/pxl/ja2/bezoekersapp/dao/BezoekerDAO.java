@@ -9,9 +9,11 @@ import java.util.List;
 public interface BezoekerDAO {
     Long registreerBezoeker(Bezoeker mapToBezoeker);
 
-    void controleerBezoek(Long bezoekerId, LocalDateTime aanmelding) throws Exception;
-
     List<Bezoeker> getBezoekersVoorAfdeling(String afdelingCode);
 
     List<Bezoeker> getAlleBezoekers();
+
+    Bezoeker findBezoekerById(Long bezoekerId);
+
+    void registreerAanmeldingVoorBezoek(Bezoeker bezoeker);
 }

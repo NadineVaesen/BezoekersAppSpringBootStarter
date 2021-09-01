@@ -2,8 +2,10 @@ package be.pxl.ja2.bezoekersapp.model;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name = "afdeling")
 public class Afdeling {
 
 	@Id

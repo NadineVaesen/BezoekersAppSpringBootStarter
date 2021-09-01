@@ -10,7 +10,8 @@ import java.util.Optional;
 
 @Entity
 @NamedQueries({
-        @NamedQuery(name = "findAllBezoekers", query = "SELECT b FROM Bezoeker b")
+        @NamedQuery(name = "findAllBezoekers", query = "SELECT b FROM Bezoeker b"),
+        @NamedQuery(name = "findBezoekerById", query = "SELECT b FROM Bezoeker b WHERE b.id = :id")
 })
 public class Bezoeker {
 

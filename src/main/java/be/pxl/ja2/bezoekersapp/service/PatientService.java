@@ -23,7 +23,7 @@ public class PatientService {
         return patientDAO.getAllPatients().stream().map(this::mapToPatientDTO).collect(Collectors.toList());
     }
 
-    private PatientDTO mapToPatientDTO(Patient patient) {
+    public PatientDTO mapToPatientDTO(Patient patient) {
         PatientDTO patientDTO = new PatientDTO();
         patientDTO.setCode(patient.getCode());
         patientDTO.setOpname(patient.getOpname());

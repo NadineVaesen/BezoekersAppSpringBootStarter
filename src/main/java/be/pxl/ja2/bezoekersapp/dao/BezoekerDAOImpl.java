@@ -23,12 +23,7 @@ public class BezoekerDAOImpl implements BezoekerDAO {
         return bezoeker.getId();
     }
 
-    @Override
-    public void controleerBezoek(Long bezoekerId, LocalDateTime aanmelding) throws Exception {
-        if (entityManager.find(Bezoeker.class, bezoekerId) != null) {
-            throw new Exception("Bezoeker is reeds aangemeld");
-        }
-    }
+
 
     @Override
     public List<Bezoeker> getBezoekersVoorAfdeling(String afdelingCode) {
@@ -51,6 +46,18 @@ public class BezoekerDAOImpl implements BezoekerDAO {
     public List<Bezoeker> getAlleBezoekers() {
         return entityManager.createNamedQuery("findAllBezoekers", Bezoeker.class).getResultList();
 
+    }
+
+    @Override
+    public Bezoeker findBezoekerById(Long bezoekerId) {
+        var bezoekerQuery = entityManager.createNamedQuery("findBezoekerById", Bezoeker.class);
+        bezoekerQuery.setParameter("id", bezoekerId);
+        return bezoekerQuery.getSingleResult();
+    }
+
+    @Transactional
+    public void registreerAanmeldingVoorBezoek(Bezoeker bezoeker) {
+        entityManager.merge(bezoeker);
     }
 
 }

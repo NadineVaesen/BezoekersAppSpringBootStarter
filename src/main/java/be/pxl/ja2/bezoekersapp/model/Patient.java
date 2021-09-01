@@ -5,6 +5,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "patient")
 @NamedQueries({
 		@NamedQuery(name = "findAllPatients", query = "SELECT p FROM Patient p")
 })

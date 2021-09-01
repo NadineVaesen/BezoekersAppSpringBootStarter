@@ -6,10 +6,12 @@ import be.pxl.ja2.bezoekersapp.rest.resources.RegistreerBezoekerResource;
 import be.pxl.ja2.bezoekersapp.service.BezoekersService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -44,6 +46,12 @@ public class BezoekersRest {
 		}
 		return new ResponseEntity<>(result, HttpStatus.BAD_REQUEST);
 
+	}
+
+	@GetMapping(path  = "{id}/{timestamp}")
+	public ResponseEntity.BodyBuilder controleerToegangBezoeker(@PathVariable("id") Long id, @PathVariable("timestamp") @DateTimeFormat(pattern = "yyyyMMddHH:mm") LocalDateTime timestamp) throws Exception {
+		bezoekersService.controleerBezoek(id, timestamp);
+		return ResponseEntity.status(HttpStatus.BAD_REQUEST);
 	}
 
 }
